@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule Manager App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fbeaff;
+      color: #2c3e50;
+    }
+    header {
+      background-color: #2a2f7f;
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      color: #2a2f7f;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      color: #2a2f7f;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 1rem;
+      background-color: #2a2f7f;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .card {
+      background-color: #ffe4f1;
+      border-left: 5px solid #2a2f7f;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .card h4 {
+      margin: 0 0 0.5rem 0;
+      color: #2a2f7f;
+    }
+    .card p {
+      margin: 0.5rem 0;
+    }
+    .card button {
+      background-color: #f06292;
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Schedule Manager App</h1>
+  </header>
+
+  <div class="container">
+    <h2>Add Shift Schedule</h2>
+    <label for="day">Day</label>
+    <select id="day">
+      <option value="Monday">Monday</option>
+      <option value="Tuesday">Tuesday</option>
+      <option value="Wednesday">Wednesday</option>
+      <option value="Thursday">Thursday</option>
+      <option value="Friday">Friday</option>
+      <option value="Saturday">Saturday</option>
+      <option value="Sunday">Sunday</option>
+    </select>
+
+    <label for="shift">Shift Description</label>
+    <input type="text" id="shift" placeholder="e.g. 9 AM - 5 PM, Team A" />
+
+    <button onclick="addShift()">Add Schedule</button>
+
+    <div class="grid" id="scheduleGrid"></div>
+  </div>
+
+  <script>
+    const scheduleGrid = document.getElementById("scheduleGrid");
+
+    function loadShifts() {
+      const shifts = JSON.parse(localStorage.getItem("shifts")) || [];
+      scheduleGrid.innerHTML = "";
+
+      shifts.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h4>${item.day}</h4>
+          <p>${item.shift}</p>
+          <button onclick="editShift(${index})">Edit</button>
+          <button onclick="deleteShift(${index})">Delete</button>
+        `;
+        scheduleGrid.appendChild(card);
+      });
+    }
+
+    function addShift() {
+      const day = document.getElementById("day").value;
+      const shift = document.getElementById("shift").value.trim();
+
+      if (!shift) return alert("Please enter shift description");
+
+      const shifts = JSON.parse(localStorage.getItem("shifts")) || [];
+      shifts.push({ day, shift });
+      localStorage.setItem("shifts", JSON.stringify(shifts));
+      loadShifts();
+      document.getElementById("shift").value = "";
+    }
+
+    function deleteShift(index) {
+      const shifts = JSON.parse(localStorage.getItem("shifts")) || [];
+      shifts.splice(index, 1);
+      localStorage.setItem("shifts", JSON.stringify(shifts));
+      loadShifts();
+    }
+
+    function editShift(index) {
+      const shifts = JSON.parse(localStorage.getItem("shifts")) || [];
+      const updated = prompt("Edit shift:", shifts[index].shift);
+      if (updated !== null) {
+        shifts[index].shift = updated;
+        localStorage.setItem("shifts", JSON.stringify(shifts));
+        loadShifts();
+      }
+    }
+
+    window.onload = loadShifts;
+  </script>
+</body>
+</html>
